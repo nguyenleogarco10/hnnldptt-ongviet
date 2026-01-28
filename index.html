@@ -120,6 +120,50 @@
             transition: opacity 0.5s;
         }
 
+        /* --- CẤU TRÚC LỚP 3D (ĐÃ ĐIỀU CHỈNH translateZ) --- */
+        
+        /* 1. Nội dung bên trong (Thấp nhất - Z=0) */
+        .letters-stack {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(0); /* Z=0 */
+            width: 380px;
+            height: 240px; 
+            z-index: 20; 
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            transform-style: preserve-3d;
+        }
+
+        /* 2. Cánh phong bì (Ở giữa - Z=3px) */
+        .side-flaps {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 30; 
+            background: 
+                linear-gradient(35deg, var(--envelope-color) 49%, var(--gold-dark) 50%, var(--envelope-color) 51%, transparent 52%) left bottom / 50% 100% no-repeat,
+                linear-gradient(-35deg, var(--envelope-color) 49%, var(--gold-dark) 50%, var(--envelope-color) 51%, transparent 52%) right bottom / 50% 100% no-repeat;
+            pointer-events: none;
+            transform: translateZ(3px); /* Đẩy lên 3px */
+        }
+
+        .bottom-flap {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 160px;
+            background: var(--envelope-color);
+            clip-path: polygon(0% 100%, 50% 35%, 100% 100%);
+            z-index: 30; 
+            border-top: 1px solid var(--gold-dark);
+            pointer-events: none;
+            transform: translateZ(3px); /* Đẩy lên 3px, bằng cánh bên */
+        }
+
+        /* 3. Nắp phong bì (Cao hơn cánh - Z=5px) */
         .lid {
             position: absolute;
             top: 0;
@@ -131,10 +175,10 @@
             border-right: 210px solid transparent;
             transform-origin: top;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 40;
+            z-index: 40; 
             will-change: transform;
             filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); 
-            transform: translateZ(1px);
+            transform: translateZ(5px); /* Đẩy lên 5px */
         }
 
         .lid::after {
@@ -150,47 +194,38 @@
             z-index: -1;
         }
 
-        .side-flaps {
+        /* 4. Con dấu (Cao nhất - Z=10px) - SỬA LỖI Ở ĐÂY */
+        .seal {
             position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 30;
-            background: 
-                linear-gradient(35deg, var(--envelope-color) 49%, var(--gold-dark) 50%, var(--envelope-color) 51%, transparent 52%) left bottom / 50% 100% no-repeat,
-                linear-gradient(-35deg, var(--envelope-color) 49%, var(--gold-dark) 50%, var(--envelope-color) 51%, transparent 52%) right bottom / 50% 100% no-repeat;
-            pointer-events: none;
-            transform: translateZ(2px);
-        }
-
-        .bottom-flap {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 160px;
-            background: var(--envelope-color);
-            clip-path: polygon(0% 100%, 50% 35%, 100% 100%);
-            z-index: 30;
-            border-top: 1px solid var(--gold-dark);
-            pointer-events: none;
-            transform: translateZ(3px);
-        }
-
-        /* --- STACK CONTAINER --- */
-        .letters-stack {
-            position: absolute;
-            bottom: 10px;
+            top: 140px;
             left: 50%;
-            transform: translateX(-50%);
-            width: 380px;
-            height: 240px; 
-            z-index: 20;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-            transform-style: preserve-3d;
+            /* Thay đổi translateZ từ 0 thành 10px để nổi hẳn lên trên */
+            transform: translate3d(-50%, -50%, 10px); 
+            width: 75px;
+            height: 75px;
+            background: radial-gradient(circle, var(--gold-light), var(--gold-primary), var(--gold-dark));
+            border-radius: 50%;
+            z-index: 100; /* Tăng z-index kịch trần */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #3b2a00;
+            font-family: 'Playfair Display', serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-light);
+            transition: all 0.5s ease;
+            will-change: transform, opacity;
         }
 
-        /* Style chung cho Card */
+        /* Khi mở thì ẩn seal đi */
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+            transform: translate3d(-50%, -50%, 10px) scale(0);
+        }
+
+        /* --- STYLE CHO CARD --- */
         .card {
             position: absolute;
             width: 100%;
@@ -198,60 +233,34 @@
             top: 0;
             left: 0;
             background-color: #fff;
-            
-            /* Cấu hình hiển thị ảnh mặc định */
             background-size: cover; 
             background-position: center;
             background-repeat: no-repeat;
-            
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
             overflow: visible; 
-            
             transition: transform 0s; 
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 8px; 
             cursor: grab;
-            
             will-change: transform; 
             backface-visibility: hidden;
             transform-origin: 50% 100%; 
         }
         
-        .card:active {
-            cursor: grabbing;
-        }
+        .card:active { cursor: grabbing; }
         
-        .card.is-resetting {
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .card.is-swiping {
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-        }
+        .card.is-resetting { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .card.is-swiping { transition: transform 0.4s ease-out, opacity 0.4s ease-out; }
 
         /* --- CẤU HÌNH ẢNH --- */
-        .card-1 { 
-            background-image: url('1.png');
-            z-index: 3; 
-        }
+        .card-1 { background-image: url('1.png'); z-index: 3; }
+        .card-2 { background-image: url('2.png'); z-index: 2; transform: scale(0.95) translateY(10px); }
+        .card-3 { background-image: url('3.png'); z-index: 1; transform: scale(0.9) translateY(20px); }
 
-        .card-2 { 
-            background-image: url('2.png'); 
-            z-index: 2; 
-            transform: scale(0.95) translateY(10px); 
-        }
-        
-        /* --- CARD 3: Giữ nguyên trong stack --- */
-        .card-3 {
-            background-image: url('3.png');
-            z-index: 1;
-            transform: scale(0.9) translateY(20px);
-        }
-
-        /* --- ZOOM OVERLAY (Đã tối ưu cho Github Pages) --- */
+        /* --- ZOOM OVERLAY --- */
         #zoom-overlay {
             position: fixed;
             inset: 0;
@@ -260,11 +269,9 @@
             display: flex; 
             justify-content: center;
             align-items: center;
-            
             opacity: 0;
-            visibility: hidden; /* Dùng visibility để tránh lỗi layout */
+            visibility: hidden;
             pointer-events: none;
-            
             transition: opacity 0.5s ease, visibility 0.5s;
             cursor: zoom-out;
         }
@@ -277,39 +284,28 @@
 
         #zoom-overlay img {
             position: absolute;
-            /* Logic xoay ngang: Chiều rộng ảnh = Chiều cao màn hình */
             width: 85vh; 
             height: 95vw;
             object-fit: contain;
-            
-            /* Animation xoay mượt */
             transform: rotate(0deg) scale(0.5); 
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Khi active thì xoay ngang và phóng to */
-        #zoom-overlay.active img {
-            transform: rotate(90deg) scale(1);
-        }
+        #zoom-overlay.active img { transform: rotate(90deg) scale(1); }
 
-        /* Trạng thái Mở Phong Bì */
-        .envelope-wrapper.open .lid {
-            transform: rotateX(180deg);
-            z-index: 1;
-        }
-
-        /* --- KÍCH THƯỚC KHUNG CHỨA KHI MỞ --- */
+        /* --- TRẠNG THÁI MỞ --- */
+        .envelope-wrapper.open .lid { transform: rotateX(180deg); z-index: 1; }
+        
+        /* Khi mở, đẩy stack lên Z-index cao nhất để tương tác */
         .envelope-wrapper.open .letters-stack {
-            /* Dùng VH/VW để không bị bóp méo trên điện thoại */
             width: 90vw; 
-            height: 75vh; 
+            height: 80vh; 
             max-width: 500px;
             aspect-ratio: unset; 
             bottom: 50%; 
             transform: translate3d(-50%, 40%, 20px); 
-            z-index: 100;
+            z-index: 100; /* Cao nhất */
         }
 
         @media (min-width: 768px) {
@@ -359,16 +355,8 @@
 
         .gesture-hint i { animation: swipeUp 1.5s infinite; }
 
-        .envelope-wrapper.open .card-1 .gesture-hint {
-            opacity: 1;
-            transition-delay: 1.5s; 
-        }
-
-        .card-3.is-rotated ~ .gesture-hint, 
-        .card-3.is-rotated .gesture-hint {
-            opacity: 0 !important;
-            display: none;
-        }
+        .envelope-wrapper.open .card-1 .gesture-hint { opacity: 1; transition-delay: 1.5s; }
+        .card-3.is-rotated ~ .gesture-hint, .card-3.is-rotated .gesture-hint { opacity: 0 !important; display: none; }
 
         @keyframes swipeUp {
             0% { transform: translateY(15px); opacity: 0; }
@@ -376,35 +364,7 @@
             100% { transform: translateY(-15px); opacity: 0; }
         }
 
-        /* Seal */
-        .seal {
-            position: absolute;
-            top: 140px;
-            left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            width: 75px;
-            height: 75px;
-            background: radial-gradient(circle, var(--gold-light), var(--gold-primary), var(--gold-dark));
-            border-radius: 50%;
-            z-index: 35;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #3b2a00;
-            font-family: 'Playfair Display', serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: 2px solid var(--gold-light);
-            transition: all 0.5s ease;
-            will-change: transform, opacity;
-        }
-
-        .envelope-wrapper.open .seal {
-            opacity: 0;
-            transform: translate3d(-50%, -50%, 0) scale(0);
-        }
-
+        /* Pagination */
         .pagination {
             position: fixed;
             bottom: 30px;
@@ -418,10 +378,7 @@
             will-change: opacity;
         }
         
-        .envelope-wrapper.open ~ .pagination {
-            opacity: 1;
-            transition-delay: 0.8s;
-        }
+        .envelope-wrapper.open ~ .pagination { opacity: 1; transition-delay: 0.8s; }
 
         .dot {
             width: 10px;
@@ -469,15 +426,12 @@
                 <div class="lid"></div>
                 <div class="side-flaps"></div>
                 <div class="bottom-flap"></div>
-                <div class="seal">PTT1</div>
                 
                 <div class="letters-stack" id="stack">
                     <!-- Card 3 (Dưới cùng) -->
                     <div class="card card-3"></div>
-                    
                     <!-- Card 2 (Ở giữa) -->
                     <div class="card card-2"></div>
-
                     <!-- Card 1 (Trên cùng) -->
                     <div class="card card-1">
                         <div class="gesture-hint">
@@ -486,6 +440,9 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Đưa Seal xuống cuối cùng để chắc chắn nó render sau cùng (trên cùng) -->
+                <div class="seal">2PTT</div> 
             </div>
         </div>
         
@@ -519,15 +476,13 @@
 
         function initCardInteraction() {}
 
-        // --- CẤU HÌNH OVERLAY (ĐÃ FIX LỖI RESET) ---
+        // --- CẤU HÌNH OVERLAY ---
         function openZoomOverlay() {
-            // Chỉ thêm class active, CSS sẽ lo phần hiển thị và animation
             zoomOverlay.classList.add('active');
         }
 
         zoomOverlay.addEventListener('click', () => {
             zoomOverlay.classList.remove('active');
-            // Sau khi transition mờ dần thì reset stack
             setTimeout(() => {
                 resetStack();
             }, 500);
@@ -544,13 +499,11 @@
             card.addEventListener('click', (e) => {
                 if (!isOpen) { openEnvelope(); return; }
 
-                // --- LOGIC CHO CARD 3 ---
                 if (card.classList.contains('card-3')) {
                     openZoomOverlay();
                     return;
                 }
                 
-                // Các card khác click thì tự động swipe lên
                 performSwipeOut(card, 'up');
             });
 
@@ -677,10 +630,8 @@
         }
 
         window.resetStack = function() {
-            // Đảm bảo overlay đóng và sạch sẽ style
             zoomOverlay.classList.remove('active');
             
-            // Xóa inline style cũ (nếu có) để không xung đột
             zoomOverlay.style.opacity = '';
             zoomOverlay.style.visibility = '';
 
