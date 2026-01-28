@@ -198,9 +198,12 @@
             top: 0;
             left: 0;
             background-color: #fff;
+            
+            /* Cấu hình hiển thị ảnh mặc định */
             background-size: cover; 
             background-position: center;
             background-repeat: no-repeat;
+            
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
             overflow: visible; 
@@ -241,36 +244,32 @@
             transform: scale(0.95) translateY(10px); 
         }
         
-        /* --- CARD 3 --- */
+        /* --- CARD 3: Giữ nguyên trong stack --- */
         .card-3 {
             background-image: url('3.png');
             z-index: 1;
             transform: scale(0.9) translateY(20px);
         }
 
-        /* --- ZOOM OVERLAY (FIXED) --- */
+        /* --- ZOOM OVERLAY (Đã tối ưu cho Github Pages) --- */
         #zoom-overlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
             background-color: rgba(0,0,0,0.95);
-            
-            /* SỬA ĐỔI QUAN TRỌNG: Dùng visibility thay vì display:none để giữ animation */
             display: flex; 
             justify-content: center;
             align-items: center;
             
-            /* Trạng thái ẩn */
             opacity: 0;
-            visibility: hidden;
-            pointer-events: none; /* Không chặn click khi ẩn */
+            visibility: hidden; /* Dùng visibility để tránh lỗi layout */
+            pointer-events: none;
             
-            transition: opacity 0.6s ease, visibility 0.6s;
+            transition: opacity 0.5s ease, visibility 0.5s;
             cursor: zoom-out;
         }
 
         #zoom-overlay.active {
-            /* Trạng thái hiện */
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
@@ -278,13 +277,14 @@
 
         #zoom-overlay img {
             position: absolute;
-            width: 90vh; 
-            height: 90vw;
+            /* Logic xoay ngang: Chiều rộng ảnh = Chiều cao màn hình */
+            width: 85vh; 
+            height: 95vw;
             object-fit: contain;
             
             /* Animation xoay mượt */
             transform: rotate(0deg) scale(0.5); 
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
@@ -302,12 +302,13 @@
 
         /* --- KÍCH THƯỚC KHUNG CHỨA KHI MỞ --- */
         .envelope-wrapper.open .letters-stack {
+            /* Dùng VH/VW để không bị bóp méo trên điện thoại */
             width: 90vw; 
-            height: 80vh; 
+            height: 75vh; 
             max-width: 500px;
             aspect-ratio: unset; 
             bottom: 50%; 
-            transform: translate3d(-50%, 35%, 20px); 
+            transform: translate3d(-50%, 40%, 20px); 
             z-index: 100;
         }
 
@@ -328,7 +329,7 @@
         /* Gesture Hint */
         .gesture-hint {
             position: absolute;
-            bottom: -75px; 
+            bottom: -70px; 
             left: 50%;
             transform: translateX(-50%);
             color: rgba(255,255,255,0.9);
@@ -361,6 +362,12 @@
         .envelope-wrapper.open .card-1 .gesture-hint {
             opacity: 1;
             transition-delay: 1.5s; 
+        }
+
+        .card-3.is-rotated ~ .gesture-hint, 
+        .card-3.is-rotated .gesture-hint {
+            opacity: 0 !important;
+            display: none;
         }
 
         @keyframes swipeUp {
@@ -523,7 +530,7 @@
             // Sau khi transition mờ dần thì reset stack
             setTimeout(() => {
                 resetStack();
-            }, 600);
+            }, 500);
         });
 
         // --- CẤU HÌNH SWIPE ---
@@ -675,7 +682,7 @@
             
             // Xóa inline style cũ (nếu có) để không xung đột
             zoomOverlay.style.opacity = '';
-            zoomOverlay.style.display = '';
+            zoomOverlay.style.visibility = '';
 
             cards.forEach(card => {
                 card.style.display = 'flex'; 
@@ -739,5 +746,4 @@
         animate();
     </script>
 </body>
-
 </html>
